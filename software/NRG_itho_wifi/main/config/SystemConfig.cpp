@@ -18,6 +18,10 @@ SystemConfig::SystemConfig()
   itho_rf_co2_join = 0;
   itho_control_interface = 0;
   itho_rf_standalone = 0;
+  sim_active = 0;
+  sim_profile = 0;
+  sim_seed = 12345;
+  sim_scenario = 0;
   syssht30 = 0;
   mqtt_active = 0;
   strlcpy(mqtt_serverName, "192.168.1.123", sizeof(mqtt_serverName));
@@ -156,6 +160,31 @@ bool SystemConfig::set(JsonObject obj)
   {
     updated = true;
     itho_rf_standalone = obj["itho_rf_standalone"];
+  }
+  if (!obj["sim_active"].isNull())
+  {
+    updated = true;
+    sim_active = obj["sim_active"];
+  }
+  if (!obj["sim_profile"].isNull())
+  {
+    updated = true;
+    sim_profile = obj["sim_profile"];
+  }
+  if (!obj["sim_seed"].isNull())
+  {
+    updated = true;
+    sim_seed = obj["sim_seed"];
+  }
+  if (!obj["sim_scenario"].isNull())
+  {
+    updated = true;
+    sim_scenario = obj["sim_scenario"];
+  }
+  // device simulation and RF standalone are mutually exclusive; RF standalone wins
+  if (sim_active == 1 && itho_rf_standalone == 1)
+  {
+    sim_active = 0;
   }
   if (!obj["api_settings_activated"].isNull())
   {
@@ -452,6 +481,10 @@ void SystemConfig::get(JsonObject obj) const
     obj["itho_rf_co2_join"] = itho_rf_co2_join;
     obj["itho_control_interface"] = itho_control_interface;
     obj["itho_rf_standalone"] = itho_rf_standalone;
+    obj["sim_active"] = sim_active;
+    obj["sim_profile"] = sim_profile;
+    obj["sim_seed"] = sim_seed;
+    obj["sim_scenario"] = sim_scenario;
     obj["api_settings_activated"].set(api_settings_activated.as<JsonArrayConst>());
   }
   if (complete || get_mqtt_settings)

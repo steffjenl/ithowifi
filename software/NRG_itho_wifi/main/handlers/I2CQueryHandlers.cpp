@@ -1,5 +1,6 @@
 #include "tasks/task_syscontrol.h"
 #include "tasks/task_configandlog.h"
+#include "simulation/SimulatedDevice.h"
 
 bool IthoInit = false;
 int8_t ithoInitResult = 0;
@@ -140,7 +141,7 @@ void initI2cFunctions()
         N_LOG("I2C: initial QueryCounters");
       }
 
-      if (systemConfig.i2c_safe_guard > 0 && currentIthoDeviceID() == 0x1B)
+      if (systemConfig.i2c_safe_guard > 0 && currentIthoDeviceID() == 0x1B && !simulatedDevice.active())
       {
         if (hardwareManager.i2c_sniffer_capable)
         {
@@ -178,7 +179,7 @@ void initI2cFunctions()
           E_LOG("I2C init: i2c safe guard needs supported itho device to work");
         }
       }
-      if (systemConfig.i2c_sniffer == 1)
+      if (systemConfig.i2c_sniffer == 1 && !simulatedDevice.active())
       {
         if (!hardwareManager.i2c_sniffer_capable)
         {
