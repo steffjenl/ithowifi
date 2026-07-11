@@ -22,6 +22,13 @@ SystemConfig::SystemConfig()
   sim_profile = 0;
   sim_seed = 12345;
   sim_scenario = 0;
+  itho_rf_co2_status_req = 0;
+  itho_rf_co2_keepalive_demand = 0;
+  itho_rf_co2_keepalive_co2 = 0;
+  itho_rf_co2_remote_idx = 0;
+  itho_rf_co2_keepalive_freq = 300;
+  itho_rf_co2_default_demand = 50;
+  itho_rf_co2_default_co2 = 500;
   syssht30 = 0;
   mqtt_active = 0;
   strlcpy(mqtt_serverName, "192.168.1.123", sizeof(mqtt_serverName));
@@ -185,6 +192,41 @@ bool SystemConfig::set(JsonObject obj)
   if (sim_active == 1 && itho_rf_standalone == 1)
   {
     sim_active = 0;
+  }
+  if (!obj["itho_rf_co2_status_req"].isNull())
+  {
+    updated = true;
+    itho_rf_co2_status_req = obj["itho_rf_co2_status_req"];
+  }
+  if (!obj["itho_rf_co2_keepalive_demand"].isNull())
+  {
+    updated = true;
+    itho_rf_co2_keepalive_demand = obj["itho_rf_co2_keepalive_demand"];
+  }
+  if (!obj["itho_rf_co2_keepalive_co2"].isNull())
+  {
+    updated = true;
+    itho_rf_co2_keepalive_co2 = obj["itho_rf_co2_keepalive_co2"];
+  }
+  if (!obj["itho_rf_co2_remote_idx"].isNull())
+  {
+    updated = true;
+    itho_rf_co2_remote_idx = obj["itho_rf_co2_remote_idx"];
+  }
+  if (!obj["itho_rf_co2_keepalive_freq"].isNull())
+  {
+    updated = true;
+    itho_rf_co2_keepalive_freq = obj["itho_rf_co2_keepalive_freq"];
+  }
+  if (!obj["itho_rf_co2_default_demand"].isNull())
+  {
+    updated = true;
+    itho_rf_co2_default_demand = obj["itho_rf_co2_default_demand"];
+  }
+  if (!obj["itho_rf_co2_default_co2"].isNull())
+  {
+    updated = true;
+    itho_rf_co2_default_co2 = obj["itho_rf_co2_default_co2"];
   }
   if (!obj["api_settings_activated"].isNull())
   {
@@ -485,6 +527,13 @@ void SystemConfig::get(JsonObject obj) const
     obj["sim_profile"] = sim_profile;
     obj["sim_seed"] = sim_seed;
     obj["sim_scenario"] = sim_scenario;
+    obj["itho_rf_co2_status_req"] = itho_rf_co2_status_req;
+    obj["itho_rf_co2_keepalive_demand"] = itho_rf_co2_keepalive_demand;
+    obj["itho_rf_co2_keepalive_co2"] = itho_rf_co2_keepalive_co2;
+    obj["itho_rf_co2_remote_idx"] = itho_rf_co2_remote_idx;
+    obj["itho_rf_co2_keepalive_freq"] = itho_rf_co2_keepalive_freq;
+    obj["itho_rf_co2_default_demand"] = itho_rf_co2_default_demand;
+    obj["itho_rf_co2_default_co2"] = itho_rf_co2_default_co2;
     obj["api_settings_activated"].set(api_settings_activated.as<JsonArrayConst>());
   }
   if (complete || get_mqtt_settings)
