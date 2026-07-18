@@ -6,7 +6,7 @@
 
 `TaskInit → TaskConfigAndLog → TaskSysControl → TaskCC1101 → TaskMQTT → TaskWeb`
 
-Each task starts the next, then enters its own loop. Single core. No `xQueueCreate` anywhere — cross-task signaling is mostly **polled global flags** plus a few real mutexes/semaphores (`isrSemaphore`, `mutexJSONLog`, `mutexWSsend`, `I2CManager::queueMutex`).
+Each task starts the next, then enters its own loop. Single core. Cross-task signaling is mostly **polled global flags** plus a few real mutexes/semaphores (`isrSemaphore`, `mutexJSONLog`, `mutexWSsend`, `I2CManager::queueMutex`); the only FreeRTOS queue is the I2C sniffer's ISR event queue (`gpio_evt_queue`).
 
 | Task | File | Priority |
 |---|---|---|
@@ -37,7 +37,7 @@ Preserve this split — it's what lets `test_native_api_validation` test logic w
 
 ## Config (`main/config/`)
 
-LittleFS JSON files + NVS backup keys (remotes only). Structs: `SystemConfig`, `WifiConfig`, `LogConfig`, `HADiscConfig`, `IthoRemote`.
+LittleFS JSON files; all config types are snapshotted to NVS before a flash repartition (`backupAllConfigs()`) and restored on next boot. Config classes: `SystemConfig`, `WifiConfig`, `LogConfig`, `HADiscConfig`, `IthoRemote`.
 
 ## RF (`main/cc1101/`)
 

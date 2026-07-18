@@ -95,7 +95,7 @@ sequenceDiagram
 | TaskWeb | `main/tasks/task_web.cpp:50` | 5 | 6144 | Web server/websocket, loops `execWebTasks()` every 25ms |
 | sniffer_task | `main/ithodevice/i2c_sniffer.cpp:208` | 17 (highest overall) | 4096 | Passive I2C bus sniffer, only on sniffer-capable hardware |
 
-**Synchronization primitives actually used** (no `xQueueCreate` anywhere in `main/`):
+**Synchronization primitives actually used** (task-to-task signaling is polled flags; the one FreeRTOS queue is the I2C sniffer's ISR event queue, `gpio_evt_queue` in `main/ithodevice/i2c_sniffer.cpp`):
 - `SemaphoreHandle_t isrSemaphore` — guards CC1101 RX in ISR `ITHOinterrupt` (`main/tasks/task_cc1101.cpp:34,36`)
 - `mutexJSONLog`, `mutexWSsend` — created `main/tasks/task_init.cpp:13-14`
 - `I2CManager::queueMutex` (`main/managers/I2CManager.h:21`) — guards a `std::deque<std::function<void()>>` command queue
@@ -129,7 +129,7 @@ flowchart LR
     COMPILE --> FW[firmware .bin]
 ```
 
-`build_script.py` (`software/NRG_itho_wifi/build_script.py`): `concat_controls_js()` merges JS fragments, `make_c_header()` gzips each asset into a C byte array, `build_webui()` writes `main/webroot/*_gz.h`, `build_openapi_spec()` generates the OpenAPI 3.0 spec and mirrors it to `docs/openapi.json`. Generated headers are `#include`d directly by `main/tasks/task_web.cpp` and served as static gzip responses — **no runtime filesystem storage of the UI**.
+`build_script.py` (`software/NRG_itho_wifi/build_script.py`): `concat_controls_js()` merges JS fragments, `make_c_header()` gzips each asset into a C byte array, `build_webui()` writes `main/webroot/*_gz.h`, `build_openapi_spec()` generates the OpenAPI 3.0 spec into `main/webroot/openapi_json_gz.h` (the standalone `docs/openapi.json` is maintained separately, not emitted by this script). Generated headers are `#include`d directly by `main/tasks/task_web.cpp` and served as static gzip responses — **no runtime filesystem storage of the UI**.
 
 ## Important entry points
 
@@ -144,7 +144,7 @@ flowchart LR
 
 ## Config persistence
 
-Backend: **LittleFS JSON** files, with **NVS backup keys** as a fallback/redundancy layer for RF remote registrations (`loadFileRemotes(..., nvs_backup_key, ...)`, `main/config/Config.h:39`). Config structs: `SystemConfig`, `WifiConfig`, `LogConfig`, `HADiscConfig`, `IthoRemote` — see `main/config/*.h`. Loaded from `TaskConfigAndLog`/`TaskSysControl`, save/reset triggered by polled flags (`saveSystemConfigflag`, `resetWifiConfigflag`).
+Backend: **LittleFS JSON** files, with an **NVS snapshot of all config types** taken before a flash repartition (`backupAllConfigs()`, `main/esp32_repartition.cpp`) and restored on the next boot via the `nvs_backup_key` load path (`loadConfigFile`/`loadFileRemotes`, `main/config/Config.cpp`). Config structs: `SystemConfig`, `WifiConfig`, `LogConfig`, `HADiscConfig`, `IthoRemote` — see `main/config/*.h`. Loaded from `TaskConfigAndLog`/`TaskSysControl`, save/reset triggered by polled flags (`saveSystemConfigflag`, `resetWifiConfigflag`).
 
 ## Related docs
 

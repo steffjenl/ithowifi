@@ -5,7 +5,7 @@
 - `master` — stable/release branch
 - `develop` — integration branch
 - `feature/<name>`, `fix/<name>` — topic branches merged into `develop`
-- Remote `forked` = upstream `arjenhiemstra/ithowifi` (this repo tracks/syncs from it); `origin` = this fork
+- `origin` = `arjenhiemstra/ithowifi` (the canonical repo). Contributors typically fork it and add their own fork as a second remote; there is no fixed `forked`/`upstream` remote in this repo.
 - Commit prefixes in use: `feat:`, `fix:`, `docs:`, `release:`, `merge:` — match this convention for new commits
 
 ## Before starting architecturally-significant work

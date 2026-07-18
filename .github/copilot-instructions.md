@@ -4,7 +4,7 @@ ESP32 firmware (PlatformIO, `arduino`+`espidf`) bridging Itho Daalderop ventilat
 
 ## Architecture overview
 
-- Boot: linear FreeRTOS task chain `TaskInit → TaskConfigAndLog → TaskSysControl → TaskCC1101 → TaskMQTT → TaskWeb`, single core, no RTOS queues — signaling is polled global flags plus a few real mutexes/semaphores.
+- Boot: linear FreeRTOS task chain `TaskInit → TaskConfigAndLog → TaskSysControl → TaskCC1101 → TaskMQTT → TaskWeb`, single core; task-chain signaling is polled global flags plus a few real mutexes/semaphores (the only FreeRTOS queue is the I2C sniffer's ISR event queue).
 - Hardware/network/RF/I2C access via global manager singletons (`main/managers/*`).
 - Device support is a data table (`ithoDevices[]`), not class inheritance.
 - REST v2: pure logic (`processXxx`, `main/api/WebAPIv2.cpp`) separate from HTTP routing (`handleXxx`, `main/api/WebAPIv2Rest.cpp`); MQTT (`main/api/MqttAPI.cpp`) reuses the same logic.

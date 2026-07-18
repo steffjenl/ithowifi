@@ -11,11 +11,11 @@ Canonical AI-agent entry point for **ithowifi** — ESP32 firmware bridging Itho
 
 ## Architecture summary
 
-- Boot is a **linear FreeRTOS task chain**: `TaskInit → TaskConfigAndLog → TaskSysControl → TaskCC1101 → TaskMQTT → TaskWeb`, single core. No `xQueueCreate` anywhere — signaling is mostly polled global flags plus a few real mutexes/semaphores.
+- Boot is a **linear FreeRTOS task chain**: `TaskInit → TaskConfigAndLog → TaskSysControl → TaskCC1101 → TaskMQTT → TaskWeb`, single core. Task-chain signaling is mostly polled global flags plus a few real mutexes/semaphores; the only FreeRTOS queue is the I2C sniffer's ISR event queue (`gpio_evt_queue`, `main/ithodevice/i2c_sniffer.cpp`).
 - Hardware/network/RF/I2C access goes through **global manager singletons** (`main/managers/*`, e.g. `rfManager`, `i2cManager`).
 - Device support is a **data table** (`ithoDevices[]` in `main/ithodevice/IthoDevice.cpp`), not a class hierarchy.
 - REST API v2 splits **pure logic** (`processXxx` in `main/api/WebAPIv2.cpp`) from **HTTP routing** (`handleXxx` in `main/api/WebAPIv2Rest.cpp`) — this is what makes native unit testing possible. MQTT (`main/api/MqttAPI.cpp`) reuses the same logic layer.
-- Config persists to **LittleFS JSON**, with **NVS backup** for RF remote registrations only.
+- Config persists to **LittleFS JSON**; before a flash repartition (which wipes LittleFS) all config types are snapshotted to **NVS** (`backupAllConfigs()`) and restored on the next boot.
 
 Full detail and evidence: [docs/adr/README.md](docs/adr/README.md) (ADR-0002 through ADR-0009).
 

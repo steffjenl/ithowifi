@@ -17,7 +17,7 @@ Apply this when adding new stateful hardware/subsystem access — extend an exis
 
 ## 2. Data-table device model
 
-`main/ithodevice/IthoDevice.h` defines `struct ihtoDeviceType` once; `main/ithodevice/IthoDevice.cpp:35` populates `ithoDevices[]` by including per-device headers from `main/ithodevice/devices/` (`cve14.h`, `hru350.h`, `wpu.h`, ...). Device-specific behavior = data (label/mapping tables), not virtual methods.
+`main/ithodevice/IthoDevice.h` defines `struct ithoDeviceType` once; `main/ithodevice/IthoDevice.cpp:35` populates `ithoDevices[]` by including per-device headers from `main/ithodevice/devices/` (`cve14.h`, `hru350.h`, `wpu.h`, ...). Device-specific behavior = data (label/mapping tables), not virtual methods.
 
 **To add a device**: add a `devices/<name>.h` with its label/mapping tables, add a row to `ithoDevices[]`. Do not create a subclass or new polymorphic type.
 
@@ -41,7 +41,7 @@ if (saveSystemConfigflag) {
 }
 ```
 
-When adding new cross-task triggers, follow this flag convention rather than introducing `xQueueCreate` (none exists in the codebase today — see [docs/adr/ADR-0004-freertos-linear-task-chain.md](../docs/adr/ADR-0004-freertos-linear-task-chain.md) before introducing one).
+When adding new cross-task triggers, follow this flag convention rather than introducing `xQueueCreate` for task-to-task messaging (the task chain uses flags; the only queue today is the I2C sniffer's ISR event queue — see [docs/adr/ADR-0004-freertos-linear-task-chain.md](../docs/adr/ADR-0004-freertos-linear-task-chain.md) before adding one).
 
 ## 5. I2C command-queue closures
 

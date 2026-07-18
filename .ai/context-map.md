@@ -29,7 +29,7 @@ Minimal-token lookup table of the highest-value files/classes/tasks/interfaces. 
 
 | Interface | File |
 |---|---|
-| Device table | `main/ithodevice/IthoDevice.h` (`ihtoDeviceType`), `IthoDevice.cpp` (`ithoDevices[]`) |
+| Device table | `main/ithodevice/IthoDevice.h` (`ithoDeviceType`), `IthoDevice.cpp` (`ithoDevices[]`) |
 | Device status parsing | `main/ithodevice/IthoStatus.cpp` |
 | Device settings get/set | `main/ithodevice/IthoSettings.cpp` |
 | Virtual remote commands | `main/ithodevice/IthoVirtualRemoteCmd.cpp` |
@@ -44,7 +44,7 @@ Minimal-token lookup table of the highest-value files/classes/tasks/interfaces. 
 
 ## Config flow
 
-`main/config/SystemConfig.h`, `WifiConfig.h`, `LogConfig.h`, `HADiscConfig.h`, `IthoRemote.h` → loaded/saved via free functions declared in `main/config/Config.h`, backed by LittleFS JSON (+ NVS backup for remotes). Triggered by polled flags (`saveSystemConfigflag`, `resetWifiConfigflag`) checked in `TaskConfigAndLog`/`TaskSysControl`.
+`main/config/SystemConfig.h`, `WifiConfig.h`, `LogConfig.h`, `HADiscConfig.h`, `IthoRemote.h` → loaded/saved via free functions declared in `main/config/Config.h`, backed by LittleFS JSON (all config types are also snapshotted to NVS before a flash repartition and restored on next boot). Triggered by polled flags (`saveSystemConfigflag`, `resetWifiConfigflag`) checked in `TaskConfigAndLog`/`TaskSysControl`.
 
 ## Build-generated (don't hand-edit)
 
